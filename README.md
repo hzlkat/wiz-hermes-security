@@ -21,18 +21,19 @@ It documents the deployment, architecture, and real-world onboarding process usi
 ## Architecture & Resource Hierarchy
 
 Understanding how Wiz models On-Premise infrastructure differs from native public clouds. The mapping follows a three-tier hierarchy:
-
+```text
 [ Wiz Project (Scope/RBAC) ]  <-- (1:N / N:1 Mapping)
-│
-└── [ Subscription Connector: dc-muc-vmware ] (Logical Container)
-│
-└── [ Native Resource: dev-nvworkb01 ] (Target Host)
-├── Runtime Sensor (eBPF Daemon)
-└── Workload Scanner (Disk/SBOM Engine)
+       │
+       └── [ Subscription Connector: dc-muc-vmware ] (Logical Container)
+                  │
+                  └── [ Native Resource: dev-nvworkb01 ] (Target Host)
+                             ├── Runtime Sensor (eBPF Daemon)
+                             └── Workload Scanner (Disk/SBOM Engine)
+```
 
 ### 1. Subscription (`dc-muc-vmware`)
 * **Role:** The logical container / virtual subscription wrapper.
-* **Purpose:** Acts as the technical "envelope" for On-Premise environments where no direct cloud provider API (e.g., AWS/Azure) or vCenter API integration is present. It groups physical and virtual servers within the same datacenter scope.
+* **Purpose:** Acts as the technical "envelope" for on-prem environments where no direct cloud provider API (e.g., AWS/Azure) or vCenter API integration is present. It groups physical and virtual servers within the same datacenter scope.
 
 ### 2. Resource (`dev-nvworkb01`)
 * **Role:** The actual target host running Debian Linux and the Hermes Agents framework.
@@ -49,7 +50,7 @@ Understanding how Wiz models On-Premise infrastructure differs from native publi
 Both agents were deployed on `dev-nvworkb01` via a unified installation script:
 
 ### 1. Wiz Runtime Sensor (eBPF Kernel Protection)
-* **Type:** High-performance, lightweight background daemon leveraging Linux **eBPF** (Extended Berkeley Packet Filter).
+* **Type:** Background daemon leveraging Linux **eBPF** (Extended Berkeley Packet Filter).
 * **Capabilities:**
   * **Process Monitoring:** Tracks spawned processes in real time (e.g., shell commands or sub-processes executed dynamically by Hermes Agents).
   * **Network Telemetry:** Monitors open sockets, active outbound connections, and suspicious traffic.
