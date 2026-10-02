@@ -43,6 +43,54 @@ Understanding how Wiz models On-Premise infrastructure differs from native publi
 * **Role:** A virtual filter / RBAC boundary determining which teams or users can view specific assets.
 * **Flexibility:** Subscriptions and their underlying resources can be assigned to one or multiple projects simultaneously.
 
+
+```mermaid
+flowchart LR
+    %% Styles
+    classDef dev fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#01579b;
+    classDef host fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100;
+    classDef wiz fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c;
+    classDef scope fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20;
+
+    subgraph DEV ["1. Developer Environment"]
+        Code["Source Code / Updates"]:::dev -->|Git Push| Repo["GitHub Repo"]:::dev
+    end
+
+    subgraph HOST ["2. Target Host (dev-nvworkb01 - Debian)"]
+        Hermes["Hermes Agents Framework<br/>(Python / AI Workloads)"]:::host
+        
+        subgraph AGENTS ["Local Security Layer"]
+            Sensor["Wiz Runtime Sensor<br/>(eBPF Kernel Protection)"]:::host
+            Scanner["Wiz Workload Scanner<br/>(Disk / SBOM Engine)"]:::host
+        end
+        
+        Hermes -->|Kernel Activity & Processes| Sensor
+        Hermes -->|Filesystem & Dependencies| Scanner
+    end
+
+    subgraph WIZ ["3. Wiz Cloud Security Platform"]
+        API["Wiz Ingestion Endpoint<br/>(api.eu30.wiz.io)"]:::wiz
+        Graph["Wiz Security Graph<br/>(Correlation & CVE Database)"]:::wiz
+        GUI["Wiz Console / Inventory<br/>(Native Host Asset)"]:::wiz
+
+        API --> Graph
+        Graph --> GUI
+    end
+
+    subgraph PROJECT ["4. Scope & Governance"]
+        Connector["Subscription Connector<br/>(dc-muc-vmware)"]:::scope
+        ScopeRule["Project Scope Rule<br/>(Systemhaus München Regensburg)"]:::scope
+        
+        Connector --> ScopeRule
+    end
+
+    %% Data Flows
+    DEV -->|Deploy / Run| Hermes
+    Sensor -->|Real-time Telemetry & Events| API
+    Scanner -->|Upload Local SBOMs| API
+    ScopeRule -->|Graph Relinking & RBAC| Graph
+
+```
 ---
 
 ## Installed Wiz Components

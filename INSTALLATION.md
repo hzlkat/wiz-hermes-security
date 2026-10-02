@@ -63,3 +63,16 @@ python -m hermes_agent --task "check-network-status"
 # 3. Observe process execution logging captured by the Wiz Sensor
 sudo journalctl -u wiz-sensor.service | grep -i "execve"
 ```
+
+### 3.3. SBOM Verification & Local Artifacts
+
+To verify that the Wiz Workload Scanner is actively generating SBOM artifacts locally, check the host-store directory:
+
+```bash
+# Verify generated SBOM artifacts and local sensor databases
+sudo ls -la /opt/wiz/sensor/host-store/
+```
+Expected Output: 
+drwx------ 2 root root sboms
+drwx------ 2 root root sboms_partial
+drwx------ 2 root root sensor_logs
