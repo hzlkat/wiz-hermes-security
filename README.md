@@ -45,51 +45,51 @@ Understanding how Wiz models On-Premise infrastructure differs from native publi
 
 
 ```mermaid
-flowchart LR
-    %% Styles
-    classDef dev fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#01579b;
-    classDef host fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100;
+flowchart TD
+    %% Custom Styling
+    classDef dev fill:#f0f4f8,stroke:#102a43,stroke-width:1.5px,color:#102a43;
+    classDef host fill:#e3f2fd,stroke:#1565c0,stroke-width:2px,color:#0d47a1;
+    classDef agent fill:#fff3e0,stroke:#ef6c00,stroke-width:1.5px,color:#e65100;
     classDef wiz fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c;
-    classDef scope fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20;
+    classDef scope fill:#e8f5e9,stroke:#2e7d32,stroke-width:1.5px,color:#1b5e20;
 
-    subgraph DEV ["1. Developer Environment"]
-        Code["Source Code / Updates"]:::dev -->|Git Push| Repo["GitHub Repo"]:::dev
+    subgraph PHASE1 ["1. Deployment & Execution"]
+        Code["Source Code / Updates"]:::dev -->|Git Push| Repo["Version Control System"]:::dev
+        Repo -->|Deploy Framework| AIWorkload
     end
 
-    subgraph HOST ["2. Target Host (dev-nvworkb01 - Debian)"]
-        Hermes["Hermes Agents Framework<br/>(Python / AI Workloads)"]:::host
+    subgraph PHASE2 ["2. Target Infrastructure (On-Premise Server)"]
+        AIWorkload["AI Agent Framework<br/>(Python / LLM Workloads)"]:::host
         
-        subgraph AGENTS ["Local Security Layer"]
-            Sensor["Wiz Runtime Sensor<br/>(eBPF Kernel Protection)"]:::host
-            Scanner["Wiz Workload Scanner<br/>(Disk / SBOM Engine)"]:::host
+        subgraph AGENTS ["Local Wiz Security Engines"]
+            Sensor["Wiz Runtime Sensor<br/>(eBPF Kernel Monitoring)"]:::agent
+            Scanner["Wiz Workload Scanner<br/>(Local Disk & SBOM Engine)"]:::agent
         end
         
-        Hermes -->|Kernel Activity & Processes| Sensor
-        Hermes -->|Filesystem & Dependencies| Scanner
+        AIWorkload -->|Kernel Events & Syscalls| Sensor
+        AIWorkload -->|Filesystem & Dependencies| Scanner
     end
 
-    subgraph WIZ ["3. Wiz Cloud Security Platform"]
-        API["Wiz Ingestion Endpoint<br/>(api.eu30.wiz.io)"]:::wiz
-        Graph["Wiz Security Graph<br/>(Correlation & CVE Database)"]:::wiz
-        GUI["Wiz Console / Inventory<br/>(Native Host Asset)"]:::wiz
+    subgraph PHASE3 ["3. Wiz Cloud Platform"]
+        Ingest["Wiz Ingestion Endpoint"]:::wiz
+        Graph["Wiz Security Graph<br/>(CVE Matching & Analysis)"]:::wiz
+        Dashboard["Wiz Management Console<br/>(Asset Inventory & Findings)"]:::wiz
 
-        API --> Graph
-        Graph --> GUI
+        Ingest --> Graph
+        Graph --> Dashboard
     end
 
-    subgraph PROJECT ["4. Scope & Governance"]
-        Connector["Subscription Connector<br/>(dc-muc-vmware)"]:::scope
-        ScopeRule["Project Scope Rule<br/>(Systemhaus München Regensburg)"]:::scope
+    subgraph PHASE4 ["4. Governance & RBAC"]
+        Connector["Subscription Connector<br/>(Logical On-Prem Container)"]:::scope
+        ProjectScope["Wiz Project Scope<br/>(Role-Based Access Control)"]:::scope
         
-        Connector --> ScopeRule
+        Connector --> ProjectScope
     end
 
-    %% Data Flows
-    DEV -->|Deploy / Run| Hermes
-    Sensor -->|Real-time Telemetry & Events| API
-    Scanner -->|Upload Local SBOMs| API
-    ScopeRule -->|Graph Relinking & RBAC| Graph
-
+    %% Data Flow Connections
+    Sensor -->|Real-Time Process Telemetry| Ingest
+    Scanner -->|Upload Local SBOM Artifacts| Ingest
+    ProjectScope -.->|Graph Relinking & RBAC Filter| Graph
 ```
 ---
 
