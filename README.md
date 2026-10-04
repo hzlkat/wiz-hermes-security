@@ -1,16 +1,16 @@
 # Hermes Agents x Wiz Cloud Security: On-Prem Infrastructure & Runtime Protection
 
-![Debian](https://img.shields.io/badge/OS-Debian%20Linux-A81D24?style=flat&logo=debian)
+![Ubuntu](https://img.shields.io/badge/OS-Ubuntu%20Linux-E95420?style=flat&logo=ubuntu)
 ![Wiz](https://img.shields.io/badge/Security-Wiz.io-5026D5?style=flat)
 ![eBPF](https://img.shields.io/badge/Technology-eBPF%20Runtime-007ACC?style=flat)
 
-> **Tags:** `wiz-security` • `hermes-agents` • `ebpf-sensor` • `workload-scanner` • `devsecops` • `debian` • `vulnerability-management`
+> **Tags:** `wiz-security` • `hermes-agents` • `ebpf-sensor` • `workload-scanner` • `devsecops` • `ubuntu` • `vulnerability-management`
 
 ---
 
 ## Goal
 
-This project evaluates the security posture of the **Hermes Agents AI Framework** running on an **On-Premise Debian Linux host (`dev-nvworkb01`)**. 
+This project evaluates the security posture of the **Hermes Agents AI Framework** running on an **On-Premise Ubuntu Linux host (`dev-nvworkb01`)**. 
 
 It documents the deployment, architecture, and real-world onboarding process using:
 * **Wiz Runtime Sensor (eBPF-based)** for real-time threat detection and process monitoring.
@@ -31,12 +31,12 @@ Understanding how Wiz models On-Premise infrastructure differs from native publi
                              └── Workload Scanner (Disk/SBOM Engine)
 ```
 
-### 1. Subscription (`dc-muc-vmware`)
+### 1. Subscription (`e.g. datacenter`)
 * **Role:** The logical container / virtual subscription wrapper.
 * **Purpose:** Acts as the technical "envelope" for on-prem environments where no direct cloud provider API (e.g., AWS/Azure) or vCenter API integration is present. It groups physical and virtual servers within the same datacenter scope.
 
-### 2. Resource (`dev-nvworkb01`)
-* **Role:** The actual target host running Debian Linux and the Hermes Agents framework.
+### 2. Resource (`e.g. vm`)
+* **Role:** The actual target host running Ubuntu Linux and the Hermes Agents framework.
 * **Relationship:** Strict 1:1 mapping (one resource belongs to exactly one subscription container). Both security agents run locally on this host.
 
 ### 3. Project Scope (Visibility & Access Control)
@@ -95,7 +95,7 @@ flowchart TD
 
 ## Installed Wiz Components
 
-Both agents were deployed on `dev-nvworkb01` via a unified installation script:
+Both agents were deployed on `vm` via a unified installation script:
 
 ### 1. Wiz Runtime Sensor (eBPF Kernel Protection)
 * **Type:** Background daemon leveraging Linux **eBPF** (Extended Berkeley Packet Filter).
@@ -125,13 +125,19 @@ When deploying Wiz sensors on unmanaged On-Premise hosts, data visibility in the
 [ Data Ingestion (HTTP 200) ]
           │
           ▼
-[ Tag & Resource Evaluation ] ──► Matches tags (e.g., Region: dc-muc-vmware, owner: kbe)
+[ Tag & Resource Evaluation ] ──► Matches tags (e.g., Region: <region_value>, owner: <owner_value>)
           │
           ▼
 [ Graph Relinking ]          ──► Maps subscription & host to target Wiz Project(s)
           │
           ▼
-[ Native Asset Rendering ]   ──► Generates
+[ Native Asset Rendering ]   ──► Generates 'Native Host / Server' asset in Project Inventory
+          │
+          ▼
+[ Asynchronous SBOM Processing ]   ──► Correlates local package inventory against global CVE database
+          │
+          ▼
+[ Security Module Activation ]    ──► Unlocks Vulnerability Management tab & RBAC findings
 ```
 ## Lessons Learned:
 Asynchronous Graph Sync: Scoping rules for new subscriptions or tags are processed in periodic background jobs (Graph-Sync interval). It can take 15 to 60 minutes before uploaded SBOM data is rendered into an active, clickable Native Host asset in the project dashboard.

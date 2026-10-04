@@ -1,6 +1,6 @@
 # Wiz Deployment & Operations Guide (`dev-nvworkb01`)
 
-This guide outlines the commands used to configure, install, and verify the Wiz Runtime Sensor and Workload Scanner on the On-Premise Debian host.
+This guide outlines the commands used to configure, install, and verify the Wiz Runtime Sensor and Workload Scanner on the On-Premise Ubuntu host.
 
 ---
 
