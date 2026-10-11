@@ -7,6 +7,23 @@
 > **Tags:** `wiz-security` • `hermes-agents` • `ebpf-sensor` • `workload-scanner` • `devsecops` • `ubuntu` • `vulnerability-management`
 
 ---
+## About WIZ
+
+Wiz is a Cloud-Native Application Protection Platform (CNAPP). It combines several security disciplines in a single platform:
+
+SPM (Security Posture Management): CSPM (Cloud), KSPM (Kubernetes), DSPM (Data), AI-SPM (AI)
+CIEM (Cloud Infrastructure Entitlement Management)
+CWPP (Cloud Workload Protection Platform)
+CDR (Cloud Detection and Response)
+Code Security (shift-left scanning of code and IaC)
+Additionally: ASM (Attack Surface Management) as part of Exposure Management
+
+The advantage: all findings are correlated in a shared Security Graph, so risky combinations become visible. 
+
+Wiz analyses cloud and on-prem environments for vulnerabilities, misconfigurations, excessive permissions, sensitive data and active threats. 
+In the cloud it works agentless: it connects via API and scans snapshots of workload disks 
+On-prem, a locally deployed scanner is used. In addition, an optional runtime sensor provides real-time threat detection.
+---
 
 ## Goal
 
