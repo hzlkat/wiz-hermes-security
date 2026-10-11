@@ -23,6 +23,7 @@ The advantage: all findings are correlated in a shared Security Graph, so risky 
 Wiz analyses cloud and on-prem environments for vulnerabilities, misconfigurations, excessive permissions, sensitive data and active threats. 
 In the cloud it works agentless: it connects via API and scans snapshots of workload disks 
 On-prem, a locally deployed scanner is used. In addition, an optional runtime sensor provides real-time threat detection.
+
 ---
 
 ## Goal
