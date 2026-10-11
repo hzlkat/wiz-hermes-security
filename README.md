@@ -11,11 +11,11 @@
 
 Wiz is a Cloud-Native Application Protection Platform (CNAPP). It combines several security disciplines in a single platform:
 
-SPM (Security Posture Management): CSPM (Cloud), KSPM (Kubernetes), DSPM (Data), AI-SPM (AI)
-CIEM (Cloud Infrastructure Entitlement Management)
-CWPP (Cloud Workload Protection Platform)
-CDR (Cloud Detection and Response)
-Code Security (shift-left scanning of code and IaC)
+- SPM (Security Posture Management): CSPM (Cloud), KSPM (Kubernetes), DSPM (Data), AI-SPM (AI)
+- CIEM (Cloud Infrastructure Entitlement Management)
+- CWPP (Cloud Workload Protection Platform)
+- CDR (Cloud Detection and Response)
+- Code Security (shift-left scanning of code and IaC)
 Additionally: ASM (Attack Surface Management) as part of Exposure Management
 
 The advantage: all findings are correlated in a shared Security Graph, so risky combinations become visible. 
@@ -28,11 +28,23 @@ On-prem, a locally deployed scanner is used. In addition, an optional runtime se
 
 ## Goal
 
-This project evaluates the security posture of the **Hermes Agents AI Framework** running on an **On-Premise Ubuntu Linux host (`dev-nvworkb01`)**. 
+This project evaluates the security posture of the **Hermes Agents AI Framework** running on an **On-Premise Ubuntu Linux host (`vm`)**. 
 
 It documents the deployment, architecture, and real-world onboarding process using:
-* **Wiz Runtime Sensor (eBPF-based)** for real-time threat detection and process monitoring.
-* **Wiz Workload Scanner (Disk Scanner)** for Software Composition Analysis (SCA) and Software Bill of Materials (SBOM) vulnerability mapping.
+* **Wiz Runtime Sensor (eBPF-based)** for real-time threat detection and runtime context.
+* **Wiz Workload Scanner (Disk Scanner)** for Software Bill of Materials (SBOM), vulnerability mapping, host config checks and AI asset discovery.
+
+### Environment
+
+| Item | Value |
+|---|---|
+| Host | `vm` (development VM) |
+| OS | Ubuntu Linux |
+| Location | On-premise datacenter |
+| Wiz subscription | `datacenter` (shown as *VMware vSphere / Datacenter*) |
+| Wiz projects | 2 projects, business impact rating: MBI (Medium) |
+| Owner tag | `owner: <owner_value>` |
+| Onboarded | 2026-09-30 |
 
 ---
 
