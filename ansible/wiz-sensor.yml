@@ -1,0 +1,175 @@
+---
+# Deploys the Wiz Runtime Sensor (+ optional Workload Scanner) on on-prem Linux hosts.
+#
+# Secrets (Client ID / Secret) come from Ansible Vault and reach the installer
+# via a temporary root-only env file (0600, deleted right after the run):
+#   - never on a command line (not visible in `ps`)
+#   - never in a shell history
+#   - never in Ansible output (no_log)
+#
+# Usage:
+#   ansible-playbook -i inventory.ini wiz-sensor.yml --ask-vault-pass
+#   ansible-playbook -i inventory.ini wiz-sensor.yml --ask-vault-pass -e wiz_force_reinstall=true   # e.g. after secret rotation
+
+- name: Deploy Wiz Runtime Sensor and Workload Scanner
+  hosts: wiz_sensors
+  become: true
+  gather_facts: true
+
+  vars:
+    wiz_installer_url: "https://downloads.wiz.io/sensor/sensor_install.sh"
+    wiz_installer_path: "/root/wiz_sensor_install.sh"
+    wiz_installer_env_path: "/root/.wiz_install.env"
+    wiz_engine_env: "/opt/wiz/sensor/host-store/engine.env"
+    wiz_install_log: "/opt/wiz/sensor/host-store/install.log"
+    wiz_force_reinstall: false
+
+  tasks:
+    - name: Check that the Vault secrets are defined
+      ansible.builtin.assert:
+        that:
+          - vault_wiz_client_id is defined
+          - vault_wiz_client_id | length > 0
+          - vault_wiz_client_secret is defined
+          - vault_wiz_client_secret | length > 0
+        fail_msg: "vault_wiz_client_id / vault_wiz_client_secret missing - check group_vars/wiz_sensors/vault.yml"
+        quiet: true
+      no_log: true
+
+    - name: Ensure curl is installed
+      ansible.builtin.apt:
+        name: curl
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Check whether the sensor is already installed
+      ansible.builtin.stat:
+        path: "{{ wiz_engine_env }}"
+      register: wiz_engine_env_stat
+
+    - name: Install / reinstall the Wiz sensor
+      when: not wiz_engine_env_stat.stat.exists or (wiz_force_reinstall | bool)
+      block:
+        - name: Build installer environment (secrets + settings)
+          ansible.builtin.set_fact:
+            wiz_install_env: >-
+              {{
+                {
+                  'WIZ_API_CLIENT_ID': vault_wiz_client_id,
+                  'WIZ_API_CLIENT_SECRET': vault_wiz_client_secret,
+                  'WIZ_SUBSCRIPTION_EXTERNAL_ID': wiz_subscription_external_id,
+                  'WIZ_SUBSCRIPTION_NAME': wiz_subscription_name,
+                  'WIZ_SUBSCRIPTION_TAGS': (wiz_subscription_tags | combine({'vm_name': inventory_hostname})) | to_json
+                }
+                | combine({'WIZ_ENABLE_DISK_SCANNER': '1'} if (wiz_enable_disk_scanner | bool) else {})
+                | combine({'WIZ_HTTP_PROXY_URL': wiz_http_proxy_url} if (wiz_http_proxy_url | default('') | length > 0) else {})
+              }}
+          no_log: true
+
+        - name: Download the Wiz installer
+          ansible.builtin.get_url:
+            url: "{{ wiz_installer_url }}"
+            dest: "{{ wiz_installer_path }}"
+            mode: "0700"
+            owner: root
+            group: root
+            force: true
+
+        # NOTE: Ansible's `environment:` keyword is NOT used on purpose - it prefixes the
+        # remote command line (/bin/sh -c 'VAR=value ...'), which would expose the secret in `ps`.
+        # Instead: root-only env file (transferred inside the module payload, not on a command line),
+        # sourced by the installer wrapper and deleted afterwards.
+        - name: Write temporary root-only installer env file
+          ansible.builtin.copy:
+            dest: "{{ wiz_installer_env_path }}"
+            owner: root
+            group: root
+            mode: "0600"
+            content: |
+              {% for key, value in wiz_install_env.items() %}
+              {{ key }}={{ value | string | quote }}
+              {% endfor %}
+          no_log: true
+
+        - name: Run the Wiz installer (secrets read from env file, not from the command line)
+          ansible.builtin.command:
+            argv:
+              - bash
+              - -c
+              - 'set -a; . "$1"; set +a; exec bash "$2"'
+              - wiz-install
+              - "{{ wiz_installer_env_path }}"
+              - "{{ wiz_installer_path }}"
+          register: wiz_install_result
+          changed_when: true
+          no_log: true
+
+      rescue:
+        - name: Read the last lines of the installer log
+          ansible.builtin.command:
+            cmd: "tail -n 30 {{ wiz_install_log }}"
+          register: wiz_install_log_tail
+          changed_when: false
+          failed_when: false
+
+        - name: Show installer log
+          ansible.builtin.debug:
+            var: wiz_install_log_tail.stdout_lines
+
+        - name: Abort
+          ansible.builtin.fail:
+            msg: "Wiz installation failed on {{ inventory_hostname }} - see installer log above."
+
+      always:
+        - name: Remove installer script and temporary env file
+          ansible.builtin.file:
+            path: "{{ item }}"
+            state: absent
+          loop:
+            - "{{ wiz_installer_path }}"
+            - "{{ wiz_installer_env_path }}"
+
+        - name: Remove secrets from Ansible facts
+          ansible.builtin.set_fact:
+            wiz_install_env: {}
+          no_log: true
+
+    # ------------------------------------------------------------------ verify
+
+    - name: Collect service facts
+      ansible.builtin.service_facts:
+
+    - name: Verify wiz-sensor service is running
+      ansible.builtin.assert:
+        that:
+          - "'wiz-sensor.service' in ansible_facts.services"
+          - "ansible_facts.services['wiz-sensor.service'].state == 'running'"
+        fail_msg: "wiz-sensor.service is not running on {{ inventory_hostname }}"
+        success_msg: "wiz-sensor.service is running"
+
+    - name: Verify engine.env permissions (secret file)
+      ansible.builtin.stat:
+        path: "{{ wiz_engine_env }}"
+      register: wiz_engine_env_after
+
+    - name: Assert engine.env is root-only
+      ansible.builtin.assert:
+        that:
+          - wiz_engine_env_after.stat.exists
+          - wiz_engine_env_after.stat.pw_name == 'root'
+          - wiz_engine_env_after.stat.mode in ['0400', '0600']
+        fail_msg: "{{ wiz_engine_env }} missing or permissions too open"
+
+    - name: Check subscription / disk scanner settings in engine.env (names only, no values)
+      ansible.builtin.shell:
+        cmd: "set -o pipefail; grep -oE '^(SUBSCRIPTION_EXTERNAL_ID|SUBSCRIPTION_NAME|SUBSCRIPTION_TAGS|ENABLE_DISK_SCANNER)=' {{ wiz_engine_env }} | tr -d '='"
+        executable: /bin/bash
+      register: wiz_engine_env_keys
+      changed_when: false
+      failed_when: false
+
+    - name: Show configured keys
+      ansible.builtin.debug:
+        msg: "engine.env contains: {{ wiz_engine_env_keys.stdout_lines | join(', ') }}"

@@ -1,0 +1,4 @@
+inventory.ini
+*.vault_pass
+.vault_pass*
+# vault.yml is allowed ONLY encrypted - the pre-commit check in README.md guards this

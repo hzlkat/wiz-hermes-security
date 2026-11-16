@@ -140,6 +140,10 @@ Both agents were deployed on `vm` via a unified installation script:
   * **SBOM Generation:** Scans local disk paths to inventory OS packages (`dpkg`/`apt`) and application-level libraries (Python `pip` dependencies, Node.js packages, binary files).
   * **Static Vulnerability Assessment:** Uploads the SBOM to the Wiz backend for correlation against global CVE databases to detect vulnerabilities in third-party libraries used by Hermes Agents.
 
+### Deployment Automation (Ansible)
+
+The sensor rollout is automated with an Ansible playbook in [`ansible/`](ansible/README.md). The Wiz service account credentials are stored encrypted with **Ansible Vault** and are passed to the installer without appearing on a command line, in the shell history or in the Ansible output. The same playbook is used for reinstallation and credential rotation.
+
 ---
 
 ## Onboarding & Scoping Workflow (Backend Syncing)

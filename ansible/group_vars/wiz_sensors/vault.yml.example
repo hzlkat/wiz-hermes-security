@@ -1,0 +1,10 @@
+---
+# TEMPLATE - do not put real values into this file.
+#
+#   cp group_vars/wiz_sensors/vault.yml.example group_vars/wiz_sensors/vault.yml
+#   ansible-vault edit group_vars/wiz_sensors/vault.yml    # (or: ansible-vault encrypt ...)
+#
+# vault.yml must ALWAYS be committed encrypted (starts with $ANSIBLE_VAULT;1.1;AES256).
+
+vault_wiz_client_id: "<WIZ_CLIENT_ID>"
+vault_wiz_client_secret: "<WIZ_CLIENT_SECRET>"

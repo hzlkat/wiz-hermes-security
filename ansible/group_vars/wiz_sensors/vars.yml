@@ -1,0 +1,17 @@
+---
+# Non-secret settings for all hosts in the [wiz_sensors] group.
+# Host-specific overrides go into host_vars/<hostname>.yml
+
+wiz_enable_disk_scanner: true
+
+wiz_subscription_external_id: "dc-muc-vmware"
+wiz_subscription_name: "dc-muc-vmware"
+
+# vm_name is added automatically from the inventory hostname.
+# ⚠️ Check the expected tag format against the Wiz on-prem documentation.
+wiz_subscription_tags:
+  Region: "dc-muc-vmware"
+  owner: "kbe"
+
+# Optional: only if the hosts need a proxy to reach *.wiz.io
+wiz_http_proxy_url: ""

@@ -1,0 +1,6 @@
+# cp inventory.ini.example inventory.ini
+
+[wiz_sensors]
+dev-nvworkb01 ansible_host=<ip_or_fqdn> ansible_user=<admin_user>
+# further hosts:
+# dev-nvworkb02 ansible_host=<ip_or_fqdn> ansible_user=<admin_user>
