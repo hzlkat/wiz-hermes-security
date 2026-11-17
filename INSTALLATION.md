@@ -1,17 +1,15 @@
-# Wiz Deployment & Operations Guide (`dev-nvworkb01`)
+# Wiz Deployment & Operations Guide (`vm01`)
 
-This guide describes how to install, configure and verify the **Wiz Runtime Sensor** and the **Wiz Workload Scanner (Disk Scanner)** on the on-premise Ubuntu host `dev-nvworkb01`.
+This guide describes how to install, configure and verify the **Wiz Runtime Sensor** and the **Wiz Workload Scanner (Disk Scanner)** on the on-premise Ubuntu host `vm01`.
 
 > **Recommended:** Use the Ansible playbook in [`ansible/`](ansible/README.md) for installation and credential rotation. It implements the steps below with the credentials stored in Ansible Vault. This guide describes the manual procedure and the verification commands.
-
-> **Note:** The official Wiz documentation for non-cloud / on-prem hosts (docs.wiz.io) requires a tenant login. Values marked with ⚠️ should be checked against it before reuse.
 
 ---
 
 ## 0. Prerequisites
 
 - Ubuntu host with systemd, `curl` and `sudo` rights
-- Outbound HTTPS from the host to the Wiz backend (`*.wiz.io`). If a proxy is required, see `WIZ_HTTP_PROXY_URL` in section 1.
+- Outbound HTTPS from the host to the Wiz backend (`*.wiz.io`).
 - A Wiz **service account** of type *Sensor* (Client ID + Client Secret) from the Wiz console
 - Optional, for eBPF checks: `sudo apt install linux-tools-$(uname -r)` (provides `bpftool`)
 
@@ -25,12 +23,12 @@ The installer copies **every** `WIZ_*` environment variable into the sensor conf
 # Enable the local Workload Scanner (Disk/SBOM Scanner)
 export WIZ_ENABLE_DISK_SCANNER=1
 
-# On-prem subscription & tags  ⚠️ check tag format against Wiz on-prem docs
-export WIZ_SUBSCRIPTION_EXTERNAL_ID='dc-muc-vmware'
-export WIZ_SUBSCRIPTION_NAME='dc-muc-vmware'
-export WIZ_SUBSCRIPTION_TAGS='{"Region":"<region_value>","owner":"<owner_value>","vm_name":"dev-nvworkb01"}'
+# On-prem subscription & tags 
+export WIZ_SUBSCRIPTION_EXTERNAL_ID='<subscription_id'
+export WIZ_SUBSCRIPTION_NAME='<subscription_name>'
+export WIZ_SUBSCRIPTION_TAGS='{"Region":"<region_value>","owner":"<owner_value>","vm_name":"<vm_name>"}'
 
-# Optional: only needed if the host must use a proxy
+# needed if the host must use a proxy
 # export WIZ_HTTP_PROXY_URL='http://proxy.example.local:3128'
 ```
 
