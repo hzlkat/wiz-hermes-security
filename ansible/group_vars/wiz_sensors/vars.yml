@@ -4,14 +4,17 @@
 
 wiz_enable_disk_scanner: true
 
-wiz_subscription_external_id: "dc-muc-vmware"
-wiz_subscription_name: "dc-muc-vmware"
+wiz_subscription_external_id: "<subscription_id>"
+wiz_subscription_name: "<subscription_name>"
 
 # vm_name is added automatically from the inventory hostname.
-# ⚠️ Check the expected tag format against the Wiz on-prem documentation.
+# Check the expected tag format against the Wiz on-prem documentation.
 wiz_subscription_tags:
-  Region: "dc-muc-vmware"
-  owner: "kbe"
+  Region: "<region_value>"
+  owner: "<owner_value>"
 
 # Optional: only if the hosts need a proxy to reach *.wiz.io
 wiz_http_proxy_url: ""
+
+# true = container install (DOCKER_INSTALL=1), false = package install (default)
+wiz_docker_install: false
