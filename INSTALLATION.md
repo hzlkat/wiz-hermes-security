@@ -1,6 +1,6 @@
-# Wiz Deployment & Operations Guide (`vm01`)
+# Wiz Deployment & Operations Guide
 
-This guide describes how to install, configure and verify the **Wiz Runtime Sensor** and the **Wiz Workload Scanner (Disk Scanner)** on the on-premise Ubuntu host `vm01`.
+This guide describes how to install, configure and verify the **Wiz Runtime Sensor** and the **Wiz Workload Scanner (Disk Scanner)** on the on-premise Ubuntu host `<vm_name>`.
 
 > **Recommended:** Use the Ansible playbook in [`ansible/`](ansible/README.md) for installation and credential rotation. It implements the steps below with the credentials stored in Ansible Vault. This guide describes the manual procedure and the verification commands.
 
