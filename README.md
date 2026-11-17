@@ -28,7 +28,7 @@ On-prem, a locally deployed scanner is used. In addition, an optional runtime se
 
 ## Goal
 
-This project evaluates the security posture of the **Hermes Agents AI Framework** running on an **On-Premise Ubuntu Linux host (`vm`)**. 
+This project evaluates the security posture of the **Hermes Agents AI Framework** running on an **On-Premise Ubuntu Linux host (`vm_name`)**. 
 
 It documents the deployment, architecture, and real-world onboarding process using:
 * **Wiz Runtime Sensor (eBPF-based)** for real-time threat detection and runtime context.
@@ -38,7 +38,7 @@ It documents the deployment, architecture, and real-world onboarding process usi
 
 | Item | Value |
 |---|---|
-| Host | `vm` (development VM) |
+| Host | `vm_name` (development VM) |
 | OS | Ubuntu Linux |
 | Location | On-premise datacenter |
 | Wiz subscription | `datacenter` (shown as *VMware vSphere / Datacenter*) |
@@ -54,18 +54,18 @@ Understanding how Wiz models On-Premise infrastructure differs from native publi
 ```text
 [ Wiz Project (Scope/RBAC) ]  <-- (1:N / N:1 Mapping)
        │
-       └── [ Subscription Connector: dc-muc-vmware ] (Logical Container)
+       └── [ Subscription Connector: <subscription_name> ] (Logical Container)
                   │
-                  └── [ Native Resource: dev-nvworkb01 ] (Target Host)
+                  └── [ Native Resource: <vm_name> ] (Target Host)
                              ├── Runtime Sensor (eBPF Daemon)
                              └── Workload Scanner (Disk/SBOM Engine)
 ```
 
-### 1. Subscription (`e.g. datacenter`)
+### 1. Subscription 
 * **Role:** The logical container / virtual subscription wrapper.
 * **Purpose:** Acts as the technical "envelope" for on-prem environments where no direct cloud provider API (e.g., AWS/Azure) or vCenter API integration is present. It groups physical and virtual servers within the same datacenter scope.
 
-### 2. Resource (`e.g. vm`)
+### 2. Resource
 * **Role:** The actual target host running Ubuntu Linux and the Hermes Agents framework.
 * **Relationship:** Strict 1:1 mapping (one resource belongs to exactly one subscription container). Both security agents run locally on this host.
 
